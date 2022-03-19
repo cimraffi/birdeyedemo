@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <dimen name="map_icon_width">60dp</dimen>
+	<dimen name="map_icon_height">60dp</dimen>
+    <dimen name="map_padding7">14dp</dimen>
+    <dimen name="text10">16sp</dimen>
+	<dimen name="text12">18sp</dimen>
+    <dimen name="radar_icon">28dp</dimen>
+	<dimen name="radar_view">240dp</dimen>
+</resources>

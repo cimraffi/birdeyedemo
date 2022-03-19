@@ -1,0 +1,49 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    
+    repositories {
+        google()
+        jcenter()
+        maven { url 'https://plugins.gradle.org/m2/' }
+		
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.1.2'
+        classpath "com.hiya:jacoco-android:0.2"
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        maven { url 'https://www.jitpack.io' }
+    }
+    project.ext {
+        versions = [
+                minSdkVersion    : 19,
+                compileSdkVersion: 28,
+                targetSdkVersion : 28,
+                buildToolsVersion: '29.0.0'
+        ]
+
+        libraries = [
+                appCompat         : 'androidx.appcompat:appcompat:1.1.0',
+                googlePlayServices: 'com.google.android.gms:play-services-location:17.0.0',
+
+                junit             : 'junit:junit:4.12',
+                assertJ           : 'com.squareup.assertj:assertj-android:1.1.1',
+                mockito           : 'org.mockito:mockito-core:2.7.2',
+
+                leakcanary        : 'com.squareup.leakcanary:leakcanary-android:2.4'
+        ]
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

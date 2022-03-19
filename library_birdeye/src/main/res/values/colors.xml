@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="color_red">#EF5036</color>
+
+    <color name="color_green">#5DB531</color>
+    <color name="color_blue">#026D79</color>
+
+    <color name="text_black">#333333</color>
+
+    <color name="text_default">#666666</color>
+
+    <color name="text_gray">#999999</color>
+
+    <color name="text_green">#32BF00</color>
+
+    <color name="text_hint">#616161</color>
+    <color name="text_hint_white">#A9A9A9</color>
+
+    <color name="color_line">#E0E0E0</color>
+
+    <color name="color_lineC">#CCCCCC</color>
+    <color name="color_lice8B">#8B8B8B</color>
+
+    <color name="dialog_button_default">#FFFFFF</color>
+
+    <color name="dialog_button_pressed">#F2F2F2</color>
+
+    <color name="operate_type_select">#FFD525</color>
+
+    <color name="black">#ff000000</color>
+    <color name="gray">#80000000</color>
+    <color name="dark_gray">#57000000</color>
+    <color name="light_gray">#10000000</color>
+    <color name="white">#ffffff</color>
+    <color name="transparent">@android:color/transparent</color>
+
+    <color name="bg_normal">#ECECEC</color>
+
+    <color name="light_grey">#EEEEEE</color>
+</resources>

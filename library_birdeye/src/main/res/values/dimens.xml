@@ -1,0 +1,9 @@
+<resources>
+    <dimen name="map_icon_width">35dp</dimen>
+    <dimen name="map_icon_height">35dp</dimen>
+    <dimen name="map_padding7">7dp</dimen>
+    <dimen name="text10">10sp</dimen>
+    <dimen name="text12">12sp</dimen>
+    <dimen name="radar_icon">15dp</dimen>
+    <dimen name="radar_view">150dp</dimen>
+</resources>

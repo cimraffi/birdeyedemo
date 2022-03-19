@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+        html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+        }
+
+        div.htmlMarker {
+        color: red;
+        cursor: pointer;
+        }
+    </style>
+    <link rel="stylesheet" href="https://aaa.mcfly.com.cn/leaflet_1.3.1/leaflet.css" />
+    <script src="https://aaa.mcfly.com.cn/leaflet_1.3.1/leaflet.js" type="text/javascript"></script>
+    <script src="https://aaa.mcfly.com.cn/cpRPA.js" type="text/javascript"></script>
+    <script src="http://ditu.google.cn/maps/api/js?v=3.exp&sensor=false&key=AIzaSyC57k-z8FgWWCI_3VmWj8W9Te9S2O3eKqo"></script>
+    <script src="https://aaa.mcfly.com.cn/coordtransform.js" type="text/javascript"></script>
+    <script src="https://aaa.mcfly.com.cn/geolocation-marker.js" type="text/javascript"></script>
+    <script>
+    //adapded from this example http://code.google.com/apis/maps/documentation/javascript/overlays.html#CustomOverlays
+     //text overlays
+    function TxtOverlay(pos, txt, cls, map) {
+
+      // Now initialize all properties.
+      this.pos = pos;
+      this.txt_ = txt;
+      this.cls_ = cls;
+      this.map_ = map;
+
+      // We define a property to hold the image's
+      // div. We'll actually create this div
+      // upon receipt of the add() method so we'll
+      // leave it null for now.
+      this.div_ = null;
+
+      // Explicitly call setMap() on this overlay
+      this.setMap(map);
+    }
+
+    TxtOverlay.prototype = new google.maps.OverlayView();
+
+    TxtOverlay.prototype.onAdd = function() {
+
+      // Note: an overlay's receipt of onAdd() indicates that
+      // the map's panes are now available for attaching
+      // the overlay to the map via the DOM.
+
+      // Create the DIV and set some basic attributes.
+      var div = document.createElement('DIV');
+      div.className = this.cls_;
+
+      div.innerHTML = this.txt_;
+
+      // Set the overlay's div_ property to this DIV
+      this.div_ = div;
+      var overlayProjection = this.getProjection();
+      var position = overlayProjection.fromLatLngToDivPixel(this.pos);
+      div.style.left = position.x + 'px';
+      div.style.top = position.y + 'px';
+      // We add an overlay to a map via one of the map's panes.
+
+      var panes = this.getPanes();
+      panes.floatPane.appendChild(div);
+    }
+    TxtOverlay.prototype.draw = function() {
+
+
+        var overlayProjection = this.getProjection();
+
+        // Retrieve the southwest and northeast coordinates of this overlay
+        // in latlngs and convert them to pixels coordinates.
+        // We'll use these coordinates to resize the DIV.
+        var position = overlayProjection.fromLatLngToDivPixel(this.pos);
+
+
+        var div = this.div_;
+        div.style.left = position.x + 'px';
+        div.style.top = position.y + 'px';
+
+
+
+      }
+      //Optional: helper methods for removing and toggling the text overlay.
+    TxtOverlay.prototype.onRemove = function() {
+      this.div_.parentNode.removeChild(this.div_);
+      this.div_ = null;
+    }
+    TxtOverlay.prototype.hide = function() {
+      if (this.div_) {
+        this.div_.style.visibility = "hidden";
+      }
+    }
+
+    TxtOverlay.prototype.show = function() {
+      if (this.div_) {
+        this.div_.style.visibility = "visible";
+      }
+    }
+
+    TxtOverlay.prototype.toggle = function() {
+      if (this.div_) {
+        if (this.div_.style.visibility == "hidden") {
+          this.show();
+        } else {
+          this.hide();
+        }
+      }
+    }
+
+    TxtOverlay.prototype.toggleDOM = function() {
+      if (this.getMap()) {
+        this.setMap(null);
+      } else {
+        this.setMap(this.map_);
+      }
+    }
+
+            function HTMLMarker(lat, lng, rotation) {
+            this.lat = lat;
+            this.lng = lng;
+            this.rotation = rotation;
+            this.pos = new google.maps.LatLng(lat, lng);
+        }
+
+        HTMLMarker.prototype = new google.maps.OverlayView();
+        HTMLMarker.prototype.onRemove = function () {}
+
+        //Initilize your html element here
+        HTMLMarker.prototype.onAdd = function () {
+            div = document.createElement('DIV');
+            div.style.position='absolute';
+            //div.style.transform='rotate('+this.rotation +'deg)';
+            //div.style.MozTransform='rotate('+this.rotation +'deg)';
+            div.className = "htmlMarker";
+           //image source use your own image in src
+            div.innerHTML = '<img src="https://aaa.mcfly.com.cn/images/aircraft.png" alt="" style="width:30px;height:30px">' ;
+            var panes = this.getPanes();
+            panes.overlayImage.appendChild(div);
+            this.div=div;
+
+            var self = this;
+google.maps.event.addDomListener(this.div, 'click', function(event) {
+    // stop click reaction on another layers
+    event.stopPropagation();
+
+    // add also event to 3rd parameter for catching
+    google.maps.event.trigger(self, 'click', event);
+});
+        }
+
+        HTMLMarker.prototype.rotate = function (r) {
+            //alert(this.div.style);
+            this.div.style.transform='rotate('+r +'deg)';
+            this.div.style.MozTransform='rotate('+r +'deg)';
+        }
+
+        HTMLMarker.prototype.draw = function () {
+            var overlayProjection = this.getProjection();
+            var position = overlayProjection.fromLatLngToDivPixel(this.pos);
+            var panes = this.getPanes();
+            this.div.style.left = position.x - 15 + 'px';
+            this.div.style.top = position.y - 15 + 'px';
+        }
+
+/*
+      customTxt = "<div>Blah blah sdfsddddddddddddddd ddddddddddddddddddddd<ul><li>Blah 1<li>blah 2 </ul></div>"
+      txt = new TxtOverlay(latlng, customTxt, "customBox", map)
+
+      txt.setMap(null);*/
+  </script>
+    <style>
+    .customBox {
+      background: yellow;
+      border: 1px solid black;
+      position: absolute;
+    }
+  </style>
+    <script>
+var map;
+var infoWindow = null;
+var markers = {};
+var infoWindowContent = {};
+var polylines = {};
+var polygons = {};
+var moveTimeout;
+var GeoMarker = null;
+var markerIconPrefix;
+var isFirstLoad=true;
+
+function initialize() {
+  var mapOptions = {
+    zoom: 10,
+    disableDefaultUI: true,
+    center: new google.maps.LatLng(0, 0),
+    mapTypeId:google.maps.MapTypeId.SATELLITE
+  };
+  map = new google.maps.Map(document.getElementById('map-canvas'),
+      mapOptions);
+
+  // Access to an overlay allows us to easily find pixel location on the map
+  overlay = new google.maps.OverlayView();
+
+  overlay.draw = function() {};
+
+  overlay.setMap(map);
+
+  google.maps.event.addListener(map, 'click', mapClick);
+
+  google.maps.event.addListener(map, 'center_changed', mapMove);
+
+  cpRPA.setDistanceFn(distance);
+
+  cpRPA.setLatlng2PxFn(latlng2Px);
+
+  cpRPA.setPx2LatlngFn(px2Latlng);
+
+  AirMapView.onMapLoaded();
+  <!--google.maps.event.addListener(map, 'tilesloaded', function () {-->
+    <!--if (isFirstLoad) {-->
+        <!--hideLogo();-->
+        <!--isFirstLoad=false;-->
+    <!--}-->
+  <!--}-->
+  GeoMarker = new GeolocationMarker();
+  GeoMarker.setCircleOptions({fillColor: '#808080'});
+}
+function hideLogo() {
+     var lst = document.getElementsByTagName("a");
+   for (i = 0; i < lst.length; i++) {
+      lst[i].parentElement.style.display = "none";
+      if (i == 1)
+        lst[i].parentElement.parentElement.parentElement.style.display = "none";
+      if(i>1)
+        lst[i].parentElement.parentElement.style.display = "none";
+    }
+ }
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//:::                                                                         :::
+//:::  This routine calculates the distance between two points (given the     :::
+//:::  latitude/longitude of those points). It is being used to calculate     :::
+//:::  the distance between two locations using GeoDataSource (TM) prodducts  :::
+//:::                                                                         :::
+//:::  Definitions:                                                           :::
+//:::    South latitudes are negative, east longitudes are positive           :::
+//:::                                                                         :::
+//:::  Passed to function:                                                    :::
+//:::    lat1, lon1 = Latitude and Longitude of point 1 (in decimal degrees)  :::
+//:::    lat2, lon2 = Latitude and Longitude of point 2 (in decimal degrees)  :::
+//:::    unit = the unit you desire for results                               :::
+//:::           where: 'M' is statute miles (default)                         :::
+//:::                  'K' is kilometers                                      :::
+//:::                  'N' is nautical miles                                  :::
+//:::                                                                         :::
+//:::  Worldwide cities and other features databases with latitude longitude  :::
+//:::  are available at https://www.geodatasource.com                         :::
+//:::                                                                         :::
+//:::  For enquiries, please contact sales@geodatasource.com                  :::
+//:::                                                                         :::
+//:::  Official Web site: https://www.geodatasource.com                       :::
+//:::                                                                         :::
+//:::               GeoDataSource.com (C) All Rights Reserved 2018            :::
+//:::                                                                         :::
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+function distance2(lat1, lon1, lat2, lon2, unit) {
+	if ((lat1 == lat2) && (lon1 == lon2)) {
+		return 0;
+	}
+	else {
+		var radlat1 = Math.PI * lat1/180;
+		var radlat2 = Math.PI * lat2/180;
+		var theta = lon1-lon2;
+		var radtheta = Math.PI * theta/180;
+		var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+		if (dist > 1) {
+			dist = 1;
+		}
+		dist = Math.acos(dist);
+		dist = dist * 180/Math.PI;
+		dist = dist * 60 * 1.1515;
+		if (unit=="K") { dist = dist * 1.609344 }
+		if (unit=="N") { dist = dist * 0.8684 }
+		return dist;
+	}
+}
+
+function distance(p1, p2) {
+    return distance2(p1.lat, p1.lng, p2.lat, p2.lng, 'K')*1000;
+    //return L.latLng(p1.lat, p1.lng).distanceTo(L.latLng(p2.lat, p2.lng))
+}
+
+function latlng2Px(latlng) {
+    latLng = new google.maps.LatLng(latlng.lat, latlng.lng)
+    point = overlay.getProjection().fromLatLngToContainerPixel(latLng);
+    return point;
+}
+
+function px2Latlng(px) {
+    point = new google.maps.Point(px[0],px[1])
+    latlng = overlay.getProjection().fromContainerPixelToLatLng(point);
+    return {lat: latlng.lat(), lng: latlng.lng()};
+}
+
+function calcArea(latlngs) {
+    var S = 0;
+    for (var i = 0; i < latlngs.length; i++) {
+        S += X(latlngs[i]) * Y(latlngs[si(i + 1, latlngs.length)]) - Y(latlngs[i]) * X(latlngs[si(i + 1, latlngs.length)])
+    }
+    return Math.abs(S) / 2
+
+    function X(latlng) {
+        return latlng.lng * lng2m(latlng);
+    }
+
+    function Y(latlng) {
+        return latlng.lat * lat2m(latlng);
+    }
+}
+
+function calcLineArea(latlngs, space) {
+    var S = 0;
+    for (var i = 0; i < latlngs.length; i += 2) {
+        var j = si(i + 1, latlngs.length);
+        S += distance(latlngs[i], latlngs[j]);
+    }
+    return S * space * 2
+}
+
+function lat2m(latlng) {
+    return distance(latlng, {
+        lat: latlng.lat + 1,
+        lng: latlng.lng
+    })
+}
+
+function lng2m(latlng) {
+    return distance(latlng, {
+        lat: latlng.lat,
+        lng: latlng.lng + 1
+    });
+}
+
+function si(i, l) {
+    if (i > l - 1) {
+        return i - l;
+    }
+    if (i < 0) {
+        return l + i;
+    }
+    return i;
+}
+
+function getMarkerIcon(iconFile) {
+  if (markerIconPrefix === undefined) {
+    markerIconPrefix = AirMapView.isChinaMode() ? 'http://ditu.google.cn/mapfiles/ms/icons/' : 'http://maps.google.com/mapfiles/ms/icons/';
+  }
+  return markerIconPrefix + iconFile;
+}
+
+function getCustomIcon(iconFile) {
+  //console.log('file:///android_asset/images/' + iconFile);
+  //if (markerIconPrefix === undefined) {
+    //markerIconPrefix = 'http://www.mcfly.com.cn/images/';
+  //  markerIconPrefix = 'file:///android_asset/images/';
+  //}
+  //return 'file:///android_asset/images/' + iconFile;
+  return 'https://aaa.mcfly.com.cn/images/' + iconFile;
+}
+
+function startTrackingUserLocation() {
+    GeoMarker.setMap(map);
+}
+
+function stopTrackingUserLocation() {
+    GeoMarker.setMap(null);
+}
+function setPositionCallback() {
+    console.log("setPositionCallback");
+    GeoMarker.geolocation_error = function(data) {
+        console.log("error");
+    }
+    GeoMarker.position_callback = function(LatLng) {
+        console.log("position_callback"+LatLng.lat());
+        AirMapView.positionCallback(LatLng.lat(), LatLng.lng());
+    }
+}
+function setPositionCallback(m) {
+    GeoMarker.position_modify = m;
+    console.log("setPositionCallback222"+m);
+    GeoMarker.geolocation_error = function(data) {
+        console.log("error");
+    }
+    GeoMarker.position_callback = function(LatLng) {
+        console.log("position_callback"+LatLng.lat());
+        AirMapView.positionCallback(LatLng.lat(), LatLng.lng());
+    }
+}
+function clearMarkers() {
+  for (var key in markers) {
+    markers[key].setMap(null);
+  }
+  markers = {};
+}
+
+function setBounds(neLat, neLng, swLat, swLng) {
+  var sw = new google.maps.LatLng(swLat, swLng);
+  var ne = new google.maps.LatLng(neLat, neLng);
+  var center = new google.maps.LatLngBounds(sw, ne);
+  map.fitBounds(center)
+}
+
+function centerMap(lat, lng) {
+  var latLng = new google.maps.LatLng(lat, lng);
+  map.setCenter(latLng);
+}
+
+function setZoom(zoom) {
+  map.setZoom(zoom);
+}
+
+function highlightMarker(markerId) {
+  var marker = markers[markerId];
+  if (marker != null) {
+    marker.setIcon(getMarkerIcon('purple-dot.png'));
+  }
+}
+
+function unhighlightMarker(markerId) {
+  var marker = markers[markerId];
+  if (marker != null) {
+    marker.setIcon(getMarkerIcon('red-dot.png'));
+  }
+}
+
+function addMarker(lat, lng) {
+  var position = new google.maps.LatLng(lat, lng);
+  var marker = new google.maps.Marker({
+      position: position,
+      map: map,
+      icon: getMarkerIcon('green-dot.png')
+  });
+}
+
+function addMarkerWithId(lat, lng, id, title, snippet, custom_icon) {
+  console.log("custom_icon: "+custom_icon);
+  addMarkerWithId(lat, lng, id, title, snippet, false, custom_icon);
+}
+
+function addMarkerWithId(lat, lng, id, title, snippet, draggable, custom_icon) {
+    console.log("custom_icon: "+custom_icon);
+  var position = new google.maps.LatLng(lat, lng);
+
+  var marker = new google.maps.Marker({
+      position: position,
+      map: map,
+      icon: custom_icon? getCustomIcon(custom_icon) :getMarkerIcon('red-dot.png'),
+      draggable: draggable
+  });
+
+  if(title != "null" || snippet != "null") {
+    var content = document.createElement("div");
+    if(title != "null")  {
+        content.innerHTML += '<div id="title"><b>' + title + '</b></div>';
+    }
+
+    if(snippet != "null") {
+        content.innerHTML += '<div id="snippet">' + snippet + '</div>';
+    }
+
+    infoWindowContent[id] = content;
+  }
+
+  google.maps.event.addListener(marker, 'click', function() {
+    map.panTo(marker.position);
+    AirMapView.markerClick(id);
+  });
+    google.maps.event.addListener(marker, 'dragstart', function() {
+    AirMapView.markerDragStart(id, marker.position.lat(), marker.position.lng());
+  });
+  google.maps.event.addListener(marker, 'drag', function() {
+    AirMapView.markerDrag(id, marker.position.lat(), marker.position.lng());
+  });
+  google.maps.event.addListener(marker, 'dragend', function() {
+    AirMapView.markerDragEnd(id, marker.position.lat(), marker.position.lng());
+  });
+
+  markers[id] = marker;
+}
+
+function addMarkerWithId(lat, lng, id, title, snippet, draggable, custom_icon) {
+  console.log("custom_icon: "+custom_icon);
+  var position = new google.maps.LatLng(lat, lng);
+
+  var marker = new google.maps.Marker({
+      position: position,
+      map: map,
+      icon: custom_icon? getCustomIcon(custom_icon) :getMarkerIcon('red-dot.png'),
+      draggable: draggable
+  });
+
+  if(title != "null" || snippet != "null") {
+    var content = document.createElement("div");
+    if(title != "null")  {
+        content.innerHTML += '<div id="title"><b>' + title + '</b></div>';
+    }
+
+    if(snippet != "null") {
+        content.innerHTML += '<div id="snippet">' + snippet + '</div>';
+    }
+
+    infoWindowContent[id] = content;
+  }
+
+  google.maps.event.addListener(marker, 'click', function() {
+    map.panTo(marker.position);
+    AirMapView.markerClick(id);
+  });
+    google.maps.event.addListener(marker, 'dragstart', function() {
+    AirMapView.markerDragStart(id, marker.position.lat(), marker.position.lng());
+  });
+  google.maps.event.addListener(marker, 'drag', function() {
+    AirMapView.markerDrag(id, marker.position.lat(), marker.position.lng());
+  });
+  google.maps.event.addListener(marker, 'dragend', function() {
+    AirMapView.markerDragEnd(id, marker.position.lat(), marker.position.lng());
+  });
+
+  markers[id] = marker;
+}
+
+function addOverlayWithId(lat, lng, id, title, snippet, draggable, custom_icon) {
+  var marker = new HTMLMarker(lat, lng, 0);
+  marker.setMap(map);
+
+  markers[id] = marker;
+}
+
+function rotateOverlay(id, rotate) {
+  var marker = markers[id];
+  if (marker != null) {
+    marker.rotate(rotate);
+  }
+}
+
+function moveOverlay(lat, long, rotate, id) {
+  var marker = markers[id];
+  if (marker != null) {
+    marker.div.style.transform='rotate('+rotate +'deg)';
+    marker.div.style.MozTransform='rotate('+rotate +'deg)';
+    marker.lat = lat;
+    marker.lng = long;
+    marker.pos = new google.maps.LatLng(marker.lat, marker.lng);
+    marker.draw();
+  }
+}
+
+function addXVI(ndvi_id) {
+    map.overlayMapTypes.clear();
+    var censusLayer =
+        new google.maps.ImageMapType({
+            getTileUrl: function (coord, zoom) {
+                // Compose URL for overlay tile
+                var s = Math.pow(2, zoom);
+                var twidth = 256;
+                var theight = 256;
+
+                //latlng bounds of the 4 corners of the google tile
+                //Note the coord passed in represents the top left hand (NW) corner of the tile.
+                var gBl = map.getProjection().fromPointToLatLng(new google.maps.Point(coord.x * twidth / s, (coord.y + 1) * theight / s)); // bottom left / SW
+                var gTr = map.getProjection().fromPointToLatLng(new google.maps.Point((coord.x + 1) * twidth / s, coord.y * theight / s)); // top right / NE
+
+                // Bounding box coords for tile in WMS pre-1.3 format (x,y)
+
+                //var bbox = parseFloat(gBl.lat()) + "," + parseFloat(gBl.lng()) + "," + parseFloat(gTr.lat()) + "," + parseFloat(gTr.lng());
+                var bbox = parseFloat(gBl.lng()) + "," + parseFloat(gBl.lat()) + "," + parseFloat(gTr.lng()) + "," + parseFloat(gTr.lat());
+                //var bbox = parseFloat(gBl.lat()) + "," + parseFloat(gBl.lng()) + "," + parseFloat(gTr.lat()) + "," + parseFloat(gTr.lng());
+                //base WMS URL
+                var url = "http://geoserver.mcfly.com.cn/geoserver/mfraster/wms?";
+
+                url += "service=WMS";           //WMS service
+                url += "&version=1.1.0";         //WMS version
+                url += "&request=GetMap";        //WMS operation
+                //url += "&layers=mfraster:" + '15579697633812956732051129863819_20190623083835.66_color'; //WMS layers to draw
+                url += "&layers=mfraster:" + ndvi_id + '_color'; //WMS layers to draw
+                url += "&styles=";               //use default style
+                url += "&format=image/png";      //image format
+                url += "&TRANSPARENT=TRUE";      //only draw areas where we have data
+                url += "&srs=EPSG:4326";         //projection WGS84
+                url += "&bbox=" + bbox;          //set bounding box for tile
+                url += "&width=256";          //set bounding box for tile
+                url += "&height=256";          //set bounding box for tile
+                //console.log(url);
+                //url += "&tiled=true";
+                url += "&bogus="+new Date().getTime();
+                return url;                 //return WMS URL for the tile
+            },
+            tileSize: new google.maps.Size(256, 256),
+            opacity: 0.85,
+            isPng: true
+        });
+
+    // add WMS layer to map
+    map.overlayMapTypes.removeAt(0);
+    map.overlayMapTypes.setAt(0,censusLayer);
+}
+
+function addTiff(ws, layer) {
+  //添加覆盖物
+    var censusLayer = new google.maps.ImageMapType({
+        getTileUrl: function (coord, zoom) {
+            // Compose URL for overlay tile
+            var s = Math.pow(2, zoom);
+            var twidth = 256;
+            var theight = 256;
+            /*
+            //latlng bounds of the 4 corners of the google tile
+            //Note the coord passed in represents the top left hand (NW) corner of the tile.
+            var gBl = map.getProjection().fromPointToLatLng(new google.maps.Point(coord.x * twidth / s, (coord.y + 1) * theight / s)); // bottom left / SW
+            var gTr = map.getProjection().fromPointToLatLng(new google.maps.Point((coord.x + 1) * twidth / s, coord.y * theight / s)); // top right / NE
+            // Bounding box coords for tile in WMS pre-1.3 format (x,y)
+            //var bbox = parseFloat(gBl.lat()) + "," + parseFloat(gBl.lng()) + "," + parseFloat(gTr.lat()) + "," + parseFloat(gTr.lng());
+            var bbox = parseFloat(gBl.lng()) + "," + parseFloat(gBl.lat()) + "," + parseFloat(gTr.lng()) + "," + parseFloat(gTr.lat());
+            */
+            //latlng bounds of the 4 corners of the google tile
+            //Note the coord passed in represents the top left hand (NW) corner of the tile.
+            var gBl = map.getProjection().fromPointToLatLng(new google.maps.Point(coord.x * twidth / s, (coord.y + 1) * theight / s)); // bottom left / SW
+            var gTr = map.getProjection().fromPointToLatLng(new google.maps.Point((coord.x + 1) * twidth / s, coord.y * theight / s)); // top right / NE
+
+            var gBl_gcj02 = coordtransform.gcj02towgs84(gBl.lng(), gBl.lat())
+            var gTr_gcj02 = coordtransform.gcj02towgs84(gTr.lng(), gTr.lat())
+            //var bbox = parseFloat(gBl.lng()) + "," + parseFloat(gBl.lat()) + "," + parseFloat(gTr.lng()) + "," + parseFloat(gTr.lat());
+            var bbox = parseFloat(gBl_gcj02[0]) + "," + parseFloat(gBl_gcj02[1]) + "," + parseFloat(gTr_gcj02[0]) + "," + parseFloat(gTr_gcj02[1]);
+            //base WMS URL
+            var url = "http://geoserver.mcfly.com.cn/geoserver/"+ws+"/wms?";
+            url += "&service=WMS";           //WMS service
+            url += "&version=1.1.0";         //WMS version
+            url += "&request=GetMap";        //WMS operation
+            url += "&layers="+layer; //WMS layers to draw
+            url += "&styles=";               //use default style
+            url += "&format=image/png";      //image format
+            url += "&TRANSPARENT=TRUE";      //only draw areas where we have data
+            url += "&srs=EPSG:4326";         //projection WGS84
+            url += "&bbox=" + bbox;          //set bounding box for tile
+            url += "&width=759";             //tile size used by google
+            url += "&height=768";
+            //url += "&tiled=true";
+            //console.log(url);
+            return url;                 //return WMS URL for the tile
+        },
+        tileSize: new google.maps.Size(256, 256),
+        opacity: 0.85,
+        isPng: true
+    });
+
+    // add WMS layer to map
+    map.overlayMapTypes.clear();
+    map.overlayMapTypes.push(censusLayer);
+}
+
+function addTextWithId(lat, lng, id, title) {
+  var position = new google.maps.LatLng(lat, lng);
+  customTxt = "<div>"+title+"</div>"
+  txt = new TxtOverlay(position, customTxt, "customBox", map)
+  markers[id] = txt;
+}
+
+function moveMarker(lat, long, id) {
+  var marker = markers[id];
+  if (marker != null) {
+    marker.setPosition( new google.maps.LatLng(lat, long) );
+  }
+}
+
+function showDefaultInfoWindow(id){
+    if(infoWindow){
+        infoWindow.close();
+    }
+    if(id in infoWindowContent){
+        infoWindow = new google.maps.InfoWindow({
+            content: infoWindowContent[id]
+        });
+        infoWindow.open(map, markers[id]);
+        google.maps.event.addDomListener(infoWindowContent[id], 'click', function() {
+            AirMapView.defaultInfoWindowClick(id);
+        });
+    }
+}
+
+function removeMarker(id) {
+  var marker = markers[id];
+  if (marker != null) {
+    marker.setMap(null);
+  }
+}
+
+function addPolyline(points, id, width, color) {
+  color = formatColor(color);
+  var polyLine = new google.maps.Polyline({
+    map: map,
+    path: points,
+    strokeColor: color,
+    strokeWeight: width / 2
+  });
+  polylines[id] = polyLine;
+}
+
+function removePolyline(id) {
+  var polyline = polylines[id];
+  if (polyline != null) {
+    polyline.setMap(null);
+  }
+}
+
+function removeAllPolylines() {
+  for (var key in polylines) {
+    removePolyline(key);
+  }
+  polylines = {};
+}
+
+function addPolygon(points, id, strokeWidth, strokeColor, fillColor) {
+  strokeColor = formatColor(strokeColor);
+  fillColor = formatColor(fillColor);
+  var polygon = new google.maps.Polygon({
+    map: map,
+    paths: points,
+    strokeColor: strokeColor,
+    strokeWeight: strokeWidth / 2,
+    fillColor: fillColor
+  });
+
+  polygons[id] = polygon;
+}
+
+function removePolygon(id) {
+  var polygon = polygons[id];
+  if (polygon != null) {
+    polygon.setMap(null);
+  }
+}
+
+function addCircle(lat, lng, radius, strokeColor, strokeWeight, fillColor) {
+  var position = new google.maps.LatLng(lat, lng);
+  var populationOptions = {
+      strokeColor: formatColor(strokeColor),
+      strokeOpacity: 0.50,
+      strokeWeight: strokeWeight,
+      fillColor: formatColor(fillColor),
+      fillOpacity: 0.35,
+      map: map,
+      center: position,
+      radius: radius
+    };
+    cityCircle = new google.maps.Circle(populationOptions);
+}
+
+function mapClick(event) {
+  AirMapView.mapClick(event.latLng.lat(), event.latLng.lng());
+  if(infoWindow){
+    infoWindow.close();
+  }
+}
+
+function mapMove() {
+  if (moveTimeout != null) {
+    clearTimeout(moveTimeout);
+  }
+  // javascript bridge not fast enough to handle events immediately.
+  moveTimeout = setTimeout(function() {
+    var latLng = map.getCenter();
+    if (latLng != null) {
+      AirMapView.mapMove(latLng.lat(), latLng.lng(), map.getZoom());
+    }
+  }, 200);
+}
+
+function getCenter() {
+  var latLng = map.getCenter();
+  if (latLng != null) {
+    AirMapView.mapCenterCallback(latLng.lat(), latLng.lng());
+  }
+}
+
+function setMapTypeId(mapType) {
+  map.setMapTypeId(mapType);
+}
+
+function getBounds() {
+  bounds = map.getBounds();
+  ne = bounds.getNorthEast();
+  sw = bounds.getSouthWest();
+  AirMapView.getBoundsCallback(ne.lat(), ne.lng(), sw.lat(), sw.lng());
+}
+
+function getScreenLocation(lat, lng) {
+    latLng = new google.maps.LatLng(lat, lng)
+    screenLocation = overlay.getProjection().fromLatLngToContainerPixel(latLng);
+    AirMapView.getLatLngScreenLocationCallback(screenLocation.x, screenLocation.y)
+}
+
+function setOptions(points, rotate, space) {
+    latlngs = cpRPA.setOptions({
+        polygon: points,
+        rotate: rotate || 0,
+        space: space || 5
+    });
+    AirMapView.onSetOptionsReady(JSON.stringify(latlngs))
+}
+
+// converts an android int color to a web color :)
+function formatColor(color) {
+  return '#' + ('000000' + (0xFFFFFF & color).toString(16)).slice(-6);
+}
+
+/**
+ * Add GeoJson info to this web map's data layer
+ * @param {string} geojson - valid json with geo info
+ * @param {float} strokeWidth - width of stroke
+ * @param {int} strokeColor - color of border
+ * @param {int} fillWidth - color filled inside border
+ */
+function addGeoJsonLayer(jsonString, strokeWidth, strokeColor, fillColor) {
+  var strokeWebColor = formatColor(strokeColor);
+  var fillWebColor = formatColor(fillColor);
+  map.data.setStyle({
+      fillColor: strokeWebColor,
+      strokeColor: fillWebColor,
+      strokeWeight: strokeWidth
+    });
+  map.data.addGeoJson(jsonString);
+}
+
+function removeGeoJsonLayer() {
+  map.data.forEach(function(feature) {
+    map.data.remove(feature);
+  });
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+</head>
+<body>
+<div id="map-canvas"></div>
+</body>
+</html>

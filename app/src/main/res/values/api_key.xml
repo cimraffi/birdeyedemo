@@ -1,0 +1,7 @@
+<resources>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyAFgHvg83GRRNrzf95XKO3JdlqLdwMkYyw</string>
+    <!--大疆sdk api key-->
+    <string name="dji_api_key" templateMergeStrategy="preserve" translatable="false">50d7970492bede3c2a3d4cbf</string>
+    <!--baidu api key-->
+    <string name="baidu_api_key" templateMergeStrategy="preserve" translatable="false">MwuWWCUakFv14yOIUtBGXci5gMClrkBe</string>
+</resources>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+    <View
+        android:id="@+id/top_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="@android:color/white">
+
+        <Button
+            android:id="@+id/detail_back"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@mipmap/back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/airway_detail"
+            android:textColor="@color/text_black"
+            android:textSize="17sp" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/color_line" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:paddingLeft="14dp">
+
+        <TextView
+            android:id="@+id/tip"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/airway_name"
+            android:textColor="@color/text_black"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/airway_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@+id/tip"
+            android:background="@color/white"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:gravity="center_vertical"
+            android:text=""
+            android:layout_marginRight="70dp"
+            android:singleLine="true"
+            android:lines="1"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textColor="@color/text_black"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/airway_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:paddingRight="14dp"
+            android:paddingLeft="10dp"
+            android:layout_centerVertical="true"
+            android:drawableRight="@mipmap/ic_edit"
+            android:visibility="visible"/>
+        <TextView
+            android:id="@+id/airway_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:text="@string/save"
+            android:textColor="@color/white"
+            android:layout_marginRight="14dp"
+            android:background="@drawable/bg_circle_green"
+            android:paddingLeft="10dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:textSize="12sp"
+            android:paddingRight="10dp"
+            android:visibility="gone"/>
+    </RelativeLayout>
+
+    <com.airbnb.android.airmapview.AirMapView
+        android:id="@+id/airway_map"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="#80000000"
+        android:orientation="vertical"
+        android:visibility="visible"/>
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/airway_delete"
+            android:layout_width="0dp"
+            android:layout_height="33dp"
+            android:text="删除航线"
+            android:layout_weight="1"
+            android:textColor="@color/color_red"
+            android:layout_marginRight="8dp"
+            android:layout_marginLeft="19dp"
+            android:background="@drawable/bg_circle_red2"
+            android:textSize="15sp"
+            android:gravity="center"/>
+        <TextView
+            android:id="@+id/airway_edit_flyline"
+            android:layout_width="0dp"
+            android:layout_height="33dp"
+            android:text="编辑航线"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:background="@drawable/bg_circle_green"
+            android:textSize="15sp"
+            android:layout_marginRight="19dp"
+            android:layout_marginLeft="8dp"
+            android:gravity="center"/>
+        <TextView
+            android:id="@+id/airway_use"
+            android:layout_width="0dp"
+            android:layout_height="33dp"
+            android:text="使用航线"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:background="@drawable/bg_circle_green"
+            android:textSize="15sp"
+            android:layout_marginRight="19dp"
+            android:layout_marginLeft="8dp"
+            android:gravity="center"/>
+    </LinearLayout>
+</LinearLayout>
